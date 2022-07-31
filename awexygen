@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -euo pipefail
+
+: ${LUA:=lua}
+if [[ -z "${AWEXYGEN_DIR:-}" ]]; then
+    AWEXYGEN_DIR="$(dirname "$(readlink -f "$0")")"
+fi
+if [[ -z "${AWESOMEWM_ASSETS_DIR:-}" ]]; then
+    for prefix in /usr /usr/local "${XDG_DATA_HOME:-$HOME/.local}"; do
+        if [[ -d "$prefix/share/awesome" ]]; then
+            AWESOMEWM_ASSETS_DIR="$prefix/share/awesome"
+            break
+        fi
+    done
+    if [[ -z "${AWESOMEWM_ASSETS_DIR:-}" ]]; then
+        echo "Could not find AwesomeWM assets. Please set env var AWESOMEWM_ASSETS_DIR manually." >&2
+        exit 1
+    fi
+fi
+AWESOMEWM_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/awesome"
+declare -a LUA_PATHS=(
+    "$("${LUA}" -e 'print(package.path)')"
+    "$AWEXYGEN_DIR/lib/?.lua"
+    "$AWEXYGEN_DIR/lib/?/init.lua"
+    "$AWESOMEWM_CONFIG_DIR/?.lua"
+    "$AWESOMEWM_CONFIG_DIR/?/init.lua"
+    "$AWESOMEWM_ASSETS_DIR/lib/?.lua"
+    "$AWESOMEWM_ASSETS_DIR/lib/?/init.lua"
+    "$AWEXYGEN_DIR/default/?.lua"
+)
+declare -a CMD=(${AWEXYGEN_EXEC_PREFIX:-})
+CMD+=("${LUA}" -- "$AWEXYGEN_DIR/loader.lua" "$@")
+LUA_PATH="$(IFS=";"; echo "${LUA_PATHS[*]}")" \
+  AWESOME_THEMES_PATH="$AWESOMEWM_ASSETS_DIR/themes" \
+  AWESOME_ICONS_PATH="$AWESOMEWM_ASSETS_DIR/icons" \
+  exec "${CMD[@]}"
