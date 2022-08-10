@@ -31,7 +31,10 @@ declare -a LUA_PATHS=(
 )
 declare -a CMD=(${AWEXYGEN_EXEC_PREFIX:-})
 CMD+=("${LUA}" -- "$AWEXYGEN_DIR/loader.lua" "$@")
-LUA_PATH="$(IFS=";"; echo "${LUA_PATHS[*]}")" \
-  AWESOME_THEMES_PATH="$AWESOMEWM_ASSETS_DIR/themes" \
-  AWESOME_ICONS_PATH="$AWESOMEWM_ASSETS_DIR/icons" \
-  exec "${CMD[@]}"
+
+export LUA_PATH="$(IFS=";"; echo "${LUA_PATHS[*]}")"
+export AWESOME_THEMES_PATH="$AWESOMEWM_ASSETS_DIR/themes"
+export AWESOME_ICONS_PATH="$AWESOMEWM_ASSETS_DIR/icons"
+export AWEXYGEN_SN_ID="${DESKTOP_STARTUP_ID:-}"
+unset DESKTOP_STARTUP_ID
+exec "${CMD[@]}"
