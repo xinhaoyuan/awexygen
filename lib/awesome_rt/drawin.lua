@@ -549,6 +549,10 @@ function drawin.new(args)
         ret._drawing_area:get_bin_window() or
         ret._drawing_area.window
     if args.gtk_layout then
+        if gdk.Display:get_default():supports_composite() then
+            ret._drawing_area.window:set_composited(true)
+            ret.is_compositing = true
+        end
         local gdk_events = ret._canvas_gdk_window:get_events()
         gdk_events["SMOOTH_SCROLL_MASK"] = nil
         ret._canvas_gdk_window:set_events(

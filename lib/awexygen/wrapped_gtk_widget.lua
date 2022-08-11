@@ -229,6 +229,11 @@ function direct:draw(context, cr, width, height)
     local x, y, _w, _h = base.rect_to_device_geometry(cr, 0, 0, width, height)
     self._private.container:size_allocate(
         gtk.Allocation{x = x, y = y, width = width, height = height})
+    if context.wibox.is_compositing then
+        cr:set_source_window(self._private.container.window, 0, 0)
+        cr:set_operator("OVER")
+        cr:paint()
+    end
 end
 
 function direct:set_gtk_widget(widget)
@@ -276,6 +281,7 @@ function direct:new()
         end,
         can_focus = true,
     }
+    ret._private.container:set_visual(gdk.Screen.get_default():get_rgba_visual())
     ret._private.container:override_background_color(
         0, gdk.RGBA{red = 0, green = 0, blue = 0, alpha = 0})
     ret._private.container:show()
