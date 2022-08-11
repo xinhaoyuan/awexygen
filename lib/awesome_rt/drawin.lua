@@ -524,8 +524,8 @@ function drawin.new(args)
             "KEY_RELEASE_MASK",
             "SCROLL_MASK",
         },
+        can_focus = true,
     }
-    ret._drawing_area.can_focus = true
     ret._drawing_area:show()
     ret._window.child = ret._drawing_area
     ret._window.gravity = "STATIC"
