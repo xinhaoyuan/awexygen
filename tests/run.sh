@@ -49,9 +49,11 @@ fi
 
 setup_xserver() {
     if (( HEADLESS )); then
+        check_command ${XVFB}
         "$XVFB" "$TEST_DISPLAY" -noreset -screen 0 "${TEST_DISPLAY_SIZE}x24" \
                 2>>"$TEST_LOG_OUTPUT" &
     else
+        check_command ${XEPHYR}
         "$XEPHYR" "$TEST_DISPLAY" -ac -name xephyr_"$TEST_DISPLAY" \
                   -noreset -screen "$TEST_DISPLAY_SIZE" 2>>"$TEST_LOG_OUTPUT" &
     fi
