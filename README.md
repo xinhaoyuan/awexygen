@@ -68,8 +68,8 @@ Note that you may be able to do some of the above using external programs (with 
 
 ### Using Gtk widgets
 
-For adventures, Awexygen provides two widget classes `awexygen.wrapped_gtk_widget.direct` and `awexygen.wrapped_gtk_widget.offscreen` to embed Gtk widgets into the AwesomeWM UI hierarchy.
-Each class has capability and limitation. See `examples/wrappped_gtk_widget.lua` for example.
+For adventures, Awexygen provides `awexygen.wrapped_gtk_widget` to embed Gtk widgets into the AwesomeWM UI hierarchy.
+See `examples/wrappped_gtk_widget.lua` for example.
 
 ## License
 

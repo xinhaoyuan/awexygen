@@ -362,7 +362,7 @@ function drawin.new(args)
         ret._window:set_keep_above(args.ontop)
     end
 
-    ret._drawing_area = gtk[args.gtk_layout and "Layout" or "DrawingArea"]{
+    ret._drawing_area = gtk.Layout{
         on_size_allocate = function (_self, alloc)
             local d = weak_drawin[1]
             if not d then return end
@@ -544,35 +544,17 @@ function drawin.new(args)
         end)
 
     ret._drawing_area:realize()
-    ret.gtk_layout = args.gtk_layout
-    ret._canvas_gdk_window = args.gtk_layout and
-        ret._drawing_area:get_bin_window() or
-        ret._drawing_area.window
-    if args.gtk_layout then
-        if gdk.Display:get_default():supports_composite() then
-            ret._drawing_area.window:set_composited(true)
-            ret.is_compositing = true
-        end
-        local gdk_events = ret._canvas_gdk_window:get_events()
-        gdk_events["SMOOTH_SCROLL_MASK"] = nil
-        ret._canvas_gdk_window:set_events(
-            gdk.EventMask(gdk_events))
+    ret._canvas_gdk_window = ret._drawing_area:get_bin_window()
+    if awexygen.common.is_compositing then
+        ret._drawing_area.window:set_composited(true)
+        ret.is_compositing = true
     end
+    local gdk_events = ret._canvas_gdk_window:get_events()
+    gdk_events["SMOOTH_SCROLL_MASK"] = nil
+    ret._canvas_gdk_window:set_events(
+        gdk.EventMask(gdk_events))
     ret._active_children = setmetatable({}, {__mode = "k"})
     ret._focused_child = setmetatable({}, {__mode = "k"})
-    function ret._canvas_gdk_window.on_pick_embedded_child(_self, x, y)
-        local d = weak_drawin[1]
-        local ec = d and d._active_children
-        local result
-        for c, info in pairs(ec) do
-            if info.x <= x and x < info.x + info.width and
-                info.y <= y and y < info.y + info.height then
-                result = c
-                break
-            end
-        end
-        return result and result.gdk_window
-    end
     ret._window:realize()
     gdk_window_to_drawin[ret._window.window] = ret
     ret._window.visible = args.visible

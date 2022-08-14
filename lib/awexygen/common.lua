@@ -1,4 +1,5 @@
 local lgi = require("lgi")
+local gdk = lgi.Gdk
 local gdk_pixbuf = lgi.GdkPixbuf
 
 local common = {}
@@ -66,5 +67,7 @@ function common.log_error(...)
     for i = 1, #args do args[i] = tostring(args[i]) end
     log_output:write("ERROR\t", table.concat(args, "\t"), "\n")
 end
+
+common.is_compositing = gdk.Display:get_default():supports_composite()
 
 return common

@@ -5,13 +5,13 @@ local lgi = require("lgi")
 local gtk = lgi.Gtk
 
 local w_1 = wibox.widget{
-    gtk_widget = gtk.Entry{expand = true, text = "Directly wrapped"},
-    widget = wgw.direct,
+    wrapped = gtk.Entry{expand = true, text = "Textbox 1"},
+    widget = wgw,
 }
 
 local w_2 = wibox.widget{
-    gtk_widget = gtk.Entry{expand = true, text = "Wrapped in offsreen"},
-    widget = wgw.offscreen,
+    wrapped = gtk.Entry{expand = true, text = "Textbox 2"},
+    widget = wgw,
 }
 
 wibox{
@@ -19,6 +19,7 @@ wibox{
         {
             {
                 w_1,
+                opacity = 0.5,
                 widget = wibox.container.place,
             },
             {
@@ -41,7 +42,3 @@ wibox{
             awexygen.app.request_exit()
         end
     end)
-
-w_2:connect_signal("mouse::enter", function (self) self:grab_focus(true) end)
-w_2:connect_signal("mouse::leave", function (self) self:grab_focus(false) end)
-w_2:connect_signal("property::focus", function (self) self.active = self.focus end)
