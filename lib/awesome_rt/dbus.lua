@@ -1,7 +1,7 @@
 local prefix = (...):match("(.-)[^%.]+$")
-local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
 
-local dbus = common.fake_capi_module{name = "dbus"}
+local dbus = fake_capi.module{name = "dbus"}
 
 function dbus.request_name()
     -- Ignore

@@ -1,11 +1,11 @@
 local prefix = (...):match("(.-)[^%.]+$")
-local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
 
 _G.awesome = require(prefix.."awesome")
 
 _G.root = require(prefix.."root")
 
-_G.tag = common.fake_capi_module{name = "tag"}
+_G.tag = fake_capi.module{name = "tag"}
 
 _G.key = require(prefix.."key")
 
@@ -17,7 +17,7 @@ _G.drawin = require(prefix.."drawin")
 
 _G.mouse = require(prefix.."mouse")
 
-local client = common.fake_capi_module{name = "client"}
+local client = fake_capi.module{name = "client"}
 
 function client.get()
     return {}

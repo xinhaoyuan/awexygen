@@ -1,7 +1,8 @@
 local prefix = (...):match("(.-)[^%.]+$")
 local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
 
-local root = common.fake_capi_module{name = "root"}
+local root = fake_capi.module{name = "root"}
 
 function root.cursor()
     -- Ignore

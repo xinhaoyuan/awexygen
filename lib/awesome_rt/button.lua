@@ -1,9 +1,12 @@
 local prefix = (...):match("(.-)[^%.]+$")
 local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
 
-local button = common.fake_capi_module{
+local button = fake_capi.module{
     name = "button",
-    call = function (self, ...) return self.new(...) end,
+    base = {
+        call = function (self, ...) return self.new(...) end,
+    }
 }
 
 function button:set_modifiers(modifiers)
@@ -30,7 +33,7 @@ function button:get_button()
 end
 
 function button.new(args)
-    local ret = common.fake_capi_object{
+    local ret = fake_capi.object{
         class = button
     }
     rawset(ret, "_is_capi_button", true)

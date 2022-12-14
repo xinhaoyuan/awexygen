@@ -62,13 +62,3 @@ cairo.Context = setmetatable(
             return original_context(s, ...)
         end
     })
-
-local original_type = type
-function type(o)
-    local t = original_type(o)
-    if t == "table" then
-        local mt = getmetatable(o)
-        if mt and mt.__type then return mt.__type end
-    end
-    return t
-end

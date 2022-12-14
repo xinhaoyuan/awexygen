@@ -1,5 +1,6 @@
 local prefix = (...):match("(.-)[^%.]+$")
 local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
 local lgi = require("lgi")
 local cairo = lgi.cairo
 local gdk = lgi.Gdk
@@ -12,12 +13,13 @@ local keygrabber = require(prefix.."keygrabber")
 local mousegrabber = require(prefix.."mousegrabber")
 local awexygen = require("awexygen")
 
-local drawin = common.fake_capi_module{
+local drawin = fake_capi.module{
     name = "drawin",
-    call = function (self, ...)
-        return self.new(...)
-    end,
-    signal_type = "object",
+    base = {
+        call = function (self, ...)
+            return self.new(...)
+        end,
+    },
 }
 
 local function resize_drawin(d, w, h)
@@ -319,7 +321,7 @@ function drawin.new(args)
     local width = args.width and math.max(1, args.width) or 400
     local height = args.height and math.max(1, args.height) or 400
     local type_hint = gdk.WindowTypeHint[string.upper(args.type or "normal")]
-    local ret = common.fake_capi_object{class = drawin}
+    local ret = fake_capi.object{class = drawin}
     ret._geometry = {x = args.x or 0, y = args.y or 0, width = width, height = height}
     local icon_pixbuf = args.icon_name == nil and (args.icon_pixbuf or awexygen.get_icon_pixbuf()) or nil
     local weak_drawin = setmetatable({ret}, {__mode = "v"})

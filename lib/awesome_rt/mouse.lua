@@ -1,21 +1,21 @@
 local prefix = (...):match("(.-)[^%.]+$")
 local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
 local screen = require(prefix.."screen")
 local drawin = require(prefix.."drawin")
 local lgi = require("lgi")
 local gdk = lgi.Gdk
 
-local mouse = common.fake_capi_module{
+local mouse = fake_capi.module{
     name = "mouse",
-    base = setmetatable(
-        {}, {
-            __index = function (_, key)
-                if key == "screen" then
-                    local _screen, x, y, _mask = screen._display:get_pointer()
-                    return screen.get_screen_at_point(x, y)
-                end
-            end,
-        }),
+    base = {
+        getter = function (_, key)
+            if key == "screen" then
+                local _screen, x, y, _mask = screen._display:get_pointer()
+                return screen.get_screen_at_point(x, y)
+            end
+        end,
+    },
 }
 
 function mouse.object_under_pointer()

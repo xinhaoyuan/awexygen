@@ -1,5 +1,7 @@
 local prefix = (...):match("(.-)[^%.]+$")
 local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
+
 local lgi = require("lgi")
 local gdk = lgi.Gdk
 local gtable = require("gears.table")
@@ -8,24 +10,24 @@ local awesome = require(prefix.."awesome")
 local screen_module
 local current_screens = {}
 local display = gdk.Display.get_default()
-screen_module = common.fake_capi_module{
+screen_module = fake_capi.module{
     name = "screen",
-    base = setmetatable(
-        {
-            _display = display,
-        }, {
-            __index = function (_self, key)
-                if key == "primary" then
-                    return current_screens[current_screens.primary_index]
-                end
-                if type(key) == "screen" then return key end
-                if type(key) == "number" then return current_screens[key] end
-            end,
-            -- Make `for s in screen` work.
-            __call = function (_self, _, e)
-                return current_screens[(e and e.index or 0) + 1]
+    base = {
+        getter = function (_self, key)
+            if key == "_display" then
+                return display
             end
-        }),
+            if key == "primary" then
+                return current_screens[current_screens.primary_index]
+            end
+            if type(key) == "screen" then return key end
+            if type(key) == "number" then return current_screens[key] end
+        end,
+        -- Make `for s in screen` work.
+        call = function (_self, _, e)
+            return current_screens[(e and e.index or 0) + 1]
+        end
+    },
 }
 function screen_module.get_screen_at_point(x, y)
     local monitor = display:get_monitor_at_point(x, y)

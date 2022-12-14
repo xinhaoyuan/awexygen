@@ -1,5 +1,6 @@
 local prefix = (...):match("(.-)[^%.]+$")
 local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
 local lgi = require("lgi")
 local glib = lgi.GLib
 local cairo = lgi.cairo
@@ -9,9 +10,17 @@ local awexygen = require("awexygen")
 local gobject = require("gears.object")
 
 local awesome_base = gobject{enable_properties = true}
-local awesome = common.fake_capi_module{
-    base = awesome_base,
-    name = "awesome"}
+local awesome = fake_capi.module{
+    name = "awesome",
+    base = {
+        getter = function (_self, key)
+            if key == "_active_modifiers" then
+                return common.gdk_modifiers_to_awesome_modifiers(
+                    gdk.Keymap.get_default():get_modifier_state())
+            end
+        end
+    }
+}
 
 local to_emit_refresh = false
 local function idle_callback()
@@ -122,9 +131,5 @@ awesome._modifiers = {
     ["Control"] = {{keysym = "Control_L"}, {keysym = "Control_R"}},
     -- Alt, Meta, Super, and Hyper are ignored.
 }
-function awesome_base.get__active_modifiers()
-    return common.gdk_modifiers_to_awesome_modifiers(
-        gdk.Keymap.get_default():get_modifier_state())
-end
 
 return awesome

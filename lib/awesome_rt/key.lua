@@ -1,11 +1,14 @@
 local prefix = (...):match("(.-)[^%.]+$")
 local common = require(prefix.."common")
+local fake_capi = require(prefix.."fake_capi")
 local lgi = require("lgi")
 local gdk = lgi.Gdk
 
-local key = common.fake_capi_module{
+local key = fake_capi.module{
     name = "key",
-    call = function (self, ...) return self.new(...) end,
+    base = {
+        call = function (self, ...) return self.new(...) end,
+    },
 }
 
 function key.get_keysym()
@@ -48,7 +51,7 @@ function key:get_key()
 end
 
 function key.new(args)
-    local ret = common.fake_capi_object{class = key}
+    local ret = fake_capi.object{class = key}
     rawset(ret, "_is_capi_key", true)
     ret.modifiers = args.modifiers or {}
     ret.key = args.key
