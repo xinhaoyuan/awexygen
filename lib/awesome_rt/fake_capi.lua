@@ -9,6 +9,8 @@ function fake_capi.module(args)
         _module_name = args.name,
         _private = {}
     }
+    -- Deprecated alias
+    ret.data = ret._private
     function ret.set_index_miss_handler(handler)
         rawset(ret, "external_getter", handler)
     end
@@ -66,6 +68,8 @@ function fake_capi.object(args)
     local class = args.class or nil
     local ret = gobject{enable_properties = false}
     ret._private = {}
+    -- Deprecated alias
+    ret.data = ret._private
     local rawstr = string.format("%s [%s]", tostring(ret), tostring(class))
     setmetatable(
         ret, {
