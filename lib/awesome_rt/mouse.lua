@@ -20,6 +20,7 @@ local mouse = fake_capi.module{
 
 function mouse.object_under_pointer()
     local w, _x, _y = gdk.Window.at_pointer()
+    if w == nil then return nil end
     local tl = w:get_toplevel()
     return drawin.find_drawin_by_gdk_window(tl)
 end

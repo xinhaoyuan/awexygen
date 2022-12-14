@@ -7,9 +7,7 @@ local cairo = lgi.cairo
 local gdk = lgi.Gdk
 local gdk_pixbuf = lgi.GdkPixbuf
 local awexygen = require("awexygen")
-local gobject = require("gears.object")
 
-local awesome_base = gobject{enable_properties = true}
 local awesome = fake_capi.module{
     name = "awesome",
     base = {

@@ -1,9 +1,11 @@
 local prefix = (...):match("(.-)[^%.]+$")
-local common = require(prefix.."common")
 local fake_capi = require(prefix.."fake_capi")
 
 local root = fake_capi.module{name = "root"}
 
+function root.tags()
+    return {}
+end
 function root.cursor()
     -- Ignore
 end
@@ -17,6 +19,7 @@ function root._keys(new_keys)
         return {}
     end
 end
+
 -- TODO calculate sizes using display information?
 function root.size()
     return 0, 0

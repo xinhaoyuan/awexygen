@@ -1,5 +1,4 @@
 local prefix = (...):match("(.-)[^%.]+$")
-local common = require(prefix.."common")
 local fake_capi = require(prefix.."fake_capi")
 
 local lgi = require("lgi")
@@ -58,25 +57,25 @@ local function update_screens()
         if primary_monitor == monitor then
             current_screens.primary_index = index
         end
-        local screen_object = common.fake_capi_object{class = screen_module}
-        gtable.crush(screen_object, {
-                         -- Used by us.
-                         monitor = monitor,
-                         index = index,
-                         -- Accessed by AWM widgets.
-                         _private = {},
-                         valid = true,
-                         geometry = {
-                             x = geometry.x, y = geometry.y,
-                             width = geometry.width, height = geometry.height,
-                         },
-                         workarea = {
-                             x = workarea.x, y = workarea.y,
-                             width = workarea.width, height = workarea.height,
-                         },
-                         -- TODO better DPI detection?
-                         dpi = default_dpi,
-                     })
+        local screen_object = fake_capi.object{class = screen_module}
+        gtable.crush(
+            screen_object, {
+                -- Used by us.
+                monitor = monitor,
+                index = index,
+                -- Accessed by AWM widgets.
+                valid = true,
+                geometry = {
+                    x = geometry.x, y = geometry.y,
+                    width = geometry.width, height = geometry.height,
+                },
+                workarea = {
+                    x = workarea.x, y = workarea.y,
+                    width = workarea.width, height = workarea.height,
+                },
+                -- TODO better DPI detection?
+                dpi = default_dpi,
+            })
         current_screens[index] = screen_object
     end
     screen_module.emit_signal("list")
