@@ -7,7 +7,7 @@ function fake_capi.module(args)
     local str = args.name and string.format("fake_capi[%s]", args.name)
     local ret = {
         _module_name = args.name,
-        _private = {}
+        _private = {valid = true}
     }
     -- Deprecated alias
     ret.data = ret._private
@@ -35,6 +35,7 @@ function fake_capi.module(args)
     function ret.disconnect_signal(signal_name, cb)
         return signal_object:disconnect_signal(signal_name, wrapped_signal_cb[cb])
     end
+    function ret:get_valid() return self._private.valid end
     local mt = {
         __tostring = str and function ()
             return str
@@ -67,7 +68,7 @@ function fake_capi.object(args)
     args = args or {}
     local class = args.class or nil
     local ret = gobject{enable_properties = false}
-    ret._private = {}
+    ret._private = {valid = true}
     -- Deprecated alias
     ret.data = ret._private
     local rawstr = string.format("%s [%s]", tostring(ret), tostring(class))

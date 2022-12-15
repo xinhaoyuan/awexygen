@@ -46,7 +46,7 @@ end
 local function update_screens()
     local primary_monitor = display:get_primary_monitor()
     for _, s in ipairs(current_screens) do
-        s.valid = false
+        s._private.valid = false
     end
     current_screens = {}
     for m = 0, display:get_n_monitors() - 1 do
@@ -64,7 +64,6 @@ local function update_screens()
                 monitor = monitor,
                 index = index,
                 -- Accessed by AWM widgets.
-                valid = true,
                 geometry = {
                     x = geometry.x, y = geometry.y,
                     width = geometry.width, height = geometry.height,

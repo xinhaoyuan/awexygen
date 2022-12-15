@@ -537,10 +537,9 @@ function drawin.new(args)
     end
     ret.drawable = drawable(ret)
 
-    ret.valid = true
     ret.__gc_guard = awexygen.gc_guard(
         function ()
-            ret.valid = false
+            ret._private.valid = false
             ret.drawable.valid = false
             ret._window:destroy()
         end)
