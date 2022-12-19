@@ -7,7 +7,10 @@ function fake_capi.module(args)
     local str = args.name and string.format("fake_capi[%s]", args.name)
     local ret = {
         _module_name = args.name,
-        _private = {valid = true}
+        _private = {
+            valid = true,
+            instances = 0,
+        }
     }
     -- Deprecated alias
     ret.data = ret._private
@@ -35,6 +38,7 @@ function fake_capi.module(args)
     function ret.disconnect_signal(signal_name, cb)
         return signal_object:disconnect_signal(signal_name, wrapped_signal_cb[cb])
     end
+    function ret.instances() return ret._private.instances end
     function ret:get_valid() return self._private.valid end
     local mt = {
         __tostring = str and function ()
@@ -66,17 +70,21 @@ end
 
 function fake_capi.object(args)
     args = args or {}
-    local class = args.class or nil
+    args.class._private.instances = args.class._private.instances + 1
     local ret = gobject{enable_properties = false}
-    ret._private = {valid = true}
+    ret._private = {
+        valid = true,
+        __class = args.class,
+    }
     -- Deprecated alias
     ret.data = ret._private
-    local rawstr = string.format("%s [%s]", tostring(ret), tostring(class))
+    local rawstr = string.format("%s [%s]", tostring(ret), tostring(args.class))
     setmetatable(
         ret, {
             __tostring = function () return rawstr end,
-            __type = class and class._module_name,
+            __type = args.class._module_name,
             __index = function (self, key)
+                local class = self._private.__class
                 if not class then return nil end
                 local v = rawget(class, key)
                 if v then return v end
@@ -87,25 +95,32 @@ function fake_capi.object(args)
                 return nil
             end,
             __newindex = function (self, key, value)
-                if class then
-                    local setter = class["set_"..key]
-                    if not setter and class["get_"..key] then
-                        print("Ignoring setting read-only property", key, value)
-                        return
-                    end
-                    if setter then setter(self, value) return end
-                    setter = rawget(class, "external_setter")
-                    if setter then setter(self, key, value) return end
+                local class = self._private.__class
+                if not class then return end
+                local setter = class["set_"..key]
+                if not setter and class["get_"..key] then
+                    print("Ignoring setting read-only property", key, value)
+                    return
                 end
+                if setter then setter(self, value) return end
+                setter = rawget(class, "external_setter")
+                if setter then setter(self, key, value) return end
                 rawset(self, key, value)
             end,
         })
     ret:_connect_everything(
         function (...)
-            class.emit_signal(...)
+            ret._private.__class.emit_signal(...)
         end
     )
     return ret
+end
+
+function fake_capi.invalidate(object)
+    local class = object._private and object._private.__class
+    if class == nil then return end
+    class._private.instances = class._private.instances - 1
+    object._private.__class = nil
 end
 
 local original_type = type

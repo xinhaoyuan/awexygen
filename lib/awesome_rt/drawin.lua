@@ -43,8 +43,8 @@ function drawin:set_x(x)
     if self._geometry.x ~= x then
         self._geometry.x = x
         self._window:move(x, self._geometry.y)
-        self:emit_signal("property::x", x)
         self:emit_signal("property::geometry")
+        self:emit_signal("property::x")
     end
 end
 
@@ -57,8 +57,8 @@ function drawin:set_y(y)
     if self._geometry.y ~= y then
         self._geometry.y = y
         self._window:move(self._geometry.x, y)
-        self:emit_signal("property::y", y)
         self:emit_signal("property::geometry")
+        self:emit_signal("property::y")
     end
 end
 
@@ -71,8 +71,8 @@ function drawin:set_width(w)
     if self._geometry.width ~= w then
         self._geometry.width = w
         resize_drawin(self, w, self._geometry.height)
-        self:emit_signal("property::width", w)
         self:emit_signal("property::geometry")
+        self:emit_signal("property::width")
     end
 end
 
@@ -85,8 +85,8 @@ function drawin:set_height(h)
     if self._geometry.height ~= h then
         self._geometry.height = h
         resize_drawin(self, self._geometry.width, h)
-        self:emit_signal("property::height", h)
         self:emit_signal("property::geometry")
+        self:emit_signal("property::height")
     end
 end
 
@@ -117,15 +117,21 @@ end
 local geometry_keys = {"x", "y", "width", "height"}
 function drawin:_set_geometry(geo)
     local changed = false
+    local old = self._geometry
+    self._geometry = {
+        x = geo.x or old.x,
+        y = geo.y or old.y,
+        width = geo.width or old.width,
+        height = geo.height or old.height,
+    }
     for _, key in ipairs(geometry_keys) do
-        if geo[key] and self._geometry[key] ~= geo[key] then
-            changed = true
+        if self._geometry[key] ~= old[key] then
+            if not changed then
+                self:emit_signal("property::geometry")
+                changed = true
+            end
             self:emit_signal("property::"..key, geo[key])
-            self._geometry[key] = geo[key]
         end
-    end
-    if changed then
-        self:emit_signal("property::geometry")
     end
 end
 
